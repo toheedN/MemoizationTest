@@ -30,7 +30,6 @@ import datetime
  */
 """
 
-
 # global variables to count number of his and misses
 hits = misses = 0
 name = ""
@@ -40,7 +39,6 @@ cache_stats = {}
 
 
 def memoize(user_func, resolver=None, timeout=None):
-
     cache = {}
     # timeouts should be int or float and by default python timers are in Milliseconds
     if not (isinstance(timeout, int) or isinstance(timeout, float)):
@@ -48,21 +46,32 @@ def memoize(user_func, resolver=None, timeout=None):
     else:
         timeout = datetime.timedelta(milliseconds=timeout)
 
-    if resolver is not None and not hasattr(resolver, '__call__'):
-        raise TypeError('unable to derive key with non-callable object ' + str(resolver))
-
     if not hasattr(user_func, '__call__'):
+        print("Raising TypeError : user_func cannot be a non-callable object")
         raise TypeError("user_func cannot be a non-callable object")
 
-    def memoize_cache_function(*args):
+    if resolver is not None and not hasattr(resolver, '__call__'):
+        print("Raising TypeError: unable to derive key with non-callable object " + str(resolver))
+        raise TypeError('unable to derive key with non-callable object ' + str(resolver))
+
+    def memoize_cache_function(*args, **kwargs):
         global misses
         global hits
         global name
-        resolved_key = str(args[0]) if resolver is None else resolver(*args)
+
+        # Merge args and keyargs to generate the key
+        cache_key_tmp = args
+        if kwargs:
+            for kwarg_ in kwargs.keys():
+                cache_key_tmp += (kwarg_, kwargs[kwarg_])
+
+        resolved_key = str(cache_key_tmp[0]) if resolver is None else resolver(*cache_key_tmp)
+        # get current for compare and timeout the existing entry
         now = datetime.datetime.now()
         if resolved_key in cache and now - cache[resolved_key][0] <= timeout:
             hits += 1
-            print(f"Cache Key : {resolved_key} has not timedout yet, Returning value : {cache[resolved_key][1]} from cache")
+            print(
+                f"Cache Key : {resolved_key} has not timedout yet, Returning value : {cache[resolved_key][1]} from cache")
             set_cache_stats(name)
             return cache[resolved_key][1]
         elif resolved_key in cache and now - cache[resolved_key][0] >= timeout:
@@ -101,3 +110,15 @@ def get_cache_stats():
 
     return cache_stats
 
+
+def make_key(args, kwargs, kwargs_mark=(object(),)):
+    """
+    Make a cache key
+    """
+
+    try:
+        hash_value = hash(key)
+    except TypeError:  # process unhashable types
+        return str(key)
+    else:
+        return HashedList(key, hash_value)
