@@ -3,13 +3,15 @@ import sys
 from time import sleep
 import pytest
 
+# Setup project paths
+sys.path.append(os.getcwd())
+sys.path.append("../")
+
 # local imports
 from memoization import memoizer
 from memoization.memoizer import get_cache_stats
 
-# Setup project paths
-sys.path.append(os.getcwd())
-sys.path.append("../")
+
 
 
 def reset_stats():
