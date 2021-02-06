@@ -1,2 +1,2 @@
-# MemoizationTest
-This is basic implementation of memoization functionality and testing in python  
+# Momoization Test Project
+Test basic memoization with timeout and resolver function.
