@@ -56,6 +56,7 @@ This project is basic implementation of Memoization in python. Project implement
 | Test memoization timeout | This test covers different scenarios of timeouts parameter for memoiation which includes negetive testing as well|
 | Test memoization with non-callable function | This test should raise and exception that function(func) "user_func cannot be a non-callable object" |
 | Test memoization with non-callable resolver | This test should raise and exception that key resolver function "unable to derive key with non-callable object" |
+| Test full example memoization fibonacci sequenc| Performing end to end testing using famous example of fibonacci sequence we will measure benefits in terms of execution time using timeit library|
 
 
 
