@@ -41,8 +41,8 @@ cache_stats = {}
 def memoize(user_func, resolver=None, timeout=None):
     cache = {}
     # timeouts should be int or float and by default python timers are in Milliseconds
-    if not (isinstance(timeout, int) or isinstance(timeout, float)):
-        raise TypeError("timeout must be integer or float")
+    if not (isinstance(timeout, int) or isinstance(timeout, float)) or (timeout <= 0):
+        raise TypeError("timeout must be a positive integer or float grater than 0")
     else:
         timeout = datetime.timedelta(milliseconds=timeout)
 
@@ -65,7 +65,7 @@ def memoize(user_func, resolver=None, timeout=None):
             for kwarg_ in kwargs.keys():
                 cache_key_tmp += (kwarg_, kwargs[kwarg_])
 
-        resolved_key = (str(cache_key_tmp[0])+"_" + user_func.__name__ if resolver is None else resolver(
+        resolved_key = (str(cache_key_tmp[0]) + "_" + user_func.__name__ if resolver is None else resolver(
             *cache_key_tmp))
 
         # get current for compare and timeout the existing entry
@@ -111,16 +111,3 @@ def get_cache_stats():
     global cache_stats
 
     return cache_stats
-
-
-def make_key(args, kwargs, kwargs_mark=(object(),)):
-    """
-    Make a cache key
-    """
-
-    try:
-        hash_value = hash(key)
-    except TypeError:  # process unhashable types
-        return str(key)
-    else:
-        return HashedList(key, hash_value)
