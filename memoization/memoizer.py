@@ -65,7 +65,9 @@ def memoize(user_func, resolver=None, timeout=None):
             for kwarg_ in kwargs.keys():
                 cache_key_tmp += (kwarg_, kwargs[kwarg_])
 
-        resolved_key = str(cache_key_tmp[0]) if resolver is None else resolver(*cache_key_tmp)
+        resolved_key = (str(cache_key_tmp[0])+"_" + user_func.__name__ if resolver is None else resolver(
+            *cache_key_tmp))
+
         # get current for compare and timeout the existing entry
         now = datetime.datetime.now()
         if resolved_key in cache and now - cache[resolved_key][0] <= timeout:

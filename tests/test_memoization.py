@@ -53,13 +53,11 @@ def test_basic_memoization_and_cache_timeout():
     # access value twice and check cache his count hits should be = 2 and misses = 0 for the key
     assert memoized(*test_arg) == return_value
     assert memoized(*test_arg) == return_value
-
-    assert get_cache_stats()[str(test_arg[0])]["hits"] == cache_hit_count and get_cache_stats()[str(test_arg[0])][
-        "misses"] == 0
+    localKey = str(test_arg[0]) + "_" + sum_up_all_values.__name__
+    assert get_cache_stats()[localKey]["hits"] == cache_hit_count and get_cache_stats()[localKey]["misses"] == 0
     sleep(2)
     assert memoized(*test_arg) == return_value
-    assert get_cache_stats()[str(test_arg[0])]["hits"] == cache_hit_count and get_cache_stats()[str(test_arg[0])][
-        "misses"] == 1
+    assert get_cache_stats()[localKey]["hits"] == cache_hit_count and get_cache_stats()[localKey]["misses"] == 1
     # Cache Stats should be 2 his and one miss
     print(f"Final Cache Stats : {get_cache_stats()}")
 
@@ -82,7 +80,7 @@ def test_memoization_first_func_param_as_key():
     assert memoized(*test_arg) == return_value
 
     # Ensure key from cache_stats should be the first argument of the  function we called
-    assert test_arg[0] in get_cache_stats()
+    assert test_arg[0] +"_" + test_function.__name__ in get_cache_stats()
     print(get_cache_stats())
 
 
