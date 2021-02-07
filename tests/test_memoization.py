@@ -1,6 +1,8 @@
 import os
 import sys
+import time
 from time import sleep
+
 import pytest
 
 # Setup project paths
@@ -18,7 +20,8 @@ def reset_stats():
     reset cache access stats for each case
     :return:
     """
-    print("resetting stats")
+    print("################# Pre-Test Conditions #####################")
+    print("################### Resetting Stats #######################")
     memoizer.hits = 0
     memoizer.misses = 0
     memoizer.cache_stats = {}
@@ -185,12 +188,66 @@ def test_memoization_with_non_callable_resolver():
 
 
 def test_full_example_memoization_fibonacci_sequence():
+
     """
     Performing end to end testing using famous example of fibonacci sequence
     we will measure benefits in terms of execution time using timeit library
-    :return:
     """
-    # ToDo
+
+    def fibonacci_without_memoizer(feb_n):
+        """
+        fibonacci series function with memoization
+        :param feb_n:
+        :return:
+        """
+        # check that the input is a positive integer
+        if type(feb_n) != int:
+            raise TypeError("n must be a positive integer")
+        if feb_n < 1:
+            raise ValueError("n must be a positive integer")
+
+        if feb_n == 1:
+            return 1
+        elif feb_n == 2:
+            return 1
+        return fibonacci_without_memoizer(feb_n - 1) + fibonacci_without_memoizer(feb_n - 2)
+
+    def fibonacci(feb_n):
+        """
+        fibonacci series function without memoiaton
+        :param feb_n:
+        """
+        # check that the input is a positive integer
+        if type(feb_n) != int:
+            raise TypeError("n must be a positive integer")
+        if feb_n < 1:
+            raise ValueError("n must be a positive integer")
+
+        if feb_n == 1:
+            return 1
+        elif feb_n == 2:
+            return 1
+        return memoized(feb_n - 1) + memoized(feb_n - 2)
+
+    memoized = memoizer.memoize(fibonacci, None, timeout=10000)
+
+    # Calculate Fibnocci for only 33 with memoization
+    start_memo_feb = time.time()
+    for n in range(1, 34):
+        print(n, ":", str(memoized(n)))
+    end_memo_feb = time.time()
+    total_time_consumed_with_memo = end_memo_feb - start_memo_feb
+    print(f"Time Lapsed during the function: {round(total_time_consumed_with_memo, 2)} seconds")
+
+    # Calculate Fibnocci for 33 without memoization
+    start = time.time()
+    for n in range(1, 34):
+        print(n, ":", str(fibonacci_without_memoizer(n)))
+    end = time.time()
+    print(f"Time Lapsed during the function: {round((end - start), 2)} seconds")
+
+    print(
+        f"Without memoization fibonacci sequence function Took: {round((end - start), 2) - round(total_time_consumed_with_memo, 2)}  more seconds")
 
 
 if __name__ == '__main__':
